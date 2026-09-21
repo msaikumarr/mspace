@@ -1,5 +1,7 @@
 # AI Productivity SaaS
 
+[![CI](https://github.com/msaikumarr/mspace/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/msaikumarr/mspace/actions/workflows/ci.yml)
+
 Multi-tenant team platform: projects and Kanban tasks, real-time chat, document Q&A (RAG), an AI Copilot, meeting assistant, analytics, RBAC and plan-based usage limits.
 
 **Stack:** React 19 + TypeScript + Vite + Tailwind + TanStack Query (client) · Node + Express 5 + Mongoose + Socket.IO (server) · MongoDB · optional Redis.

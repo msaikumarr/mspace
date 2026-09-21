@@ -1,0 +1,50 @@
+# Weekly dependency updates. Minor and patch releases are grouped into a single pull request per package so the SDKs that
+# release constantly (AWS, Stripe, Playwright) do not flood the repo; major versions arrive on their own for a proper look.
+# Every update is a pull request, so the CI workflow tests it before anything reaches main.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /server
+    schedule: { interval: weekly, day: monday }
+    labels: [dependencies]
+    commit-message: { prefix: "deps(server)" }
+    groups:
+      minor-and-patch: { update-types: [minor, patch] }
+
+  - package-ecosystem: npm
+    directory: /client
+    schedule: { interval: weekly, day: monday }
+    labels: [dependencies]
+    commit-message: { prefix: "deps(client)" }
+    groups:
+      minor-and-patch: { update-types: [minor, patch] }
+
+  - package-ecosystem: npm
+    directory: /tests
+    schedule: { interval: weekly, day: monday }
+    labels: [dependencies]
+    commit-message: { prefix: "deps(e2e)" }
+    groups:
+      minor-and-patch: { update-types: [minor, patch] }
+
+  # the actions used by .github/workflows/ci.yml
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly, day: monday }
+    labels: [dependencies, ci]
+    commit-message: { prefix: "ci" }
+    groups:
+      actions: { patterns: ["*"] }
+
+  # base images in the Dockerfiles (node, nginx)
+  - package-ecosystem: docker
+    directory: /server
+    schedule: { interval: weekly, day: monday }
+    labels: [dependencies, docker]
+    commit-message: { prefix: "docker(server)" }
+
+  - package-ecosystem: docker
+    directory: /client
+    schedule: { interval: weekly, day: monday }
+    labels: [dependencies, docker]
+    commit-message: { prefix: "docker(client)" }
