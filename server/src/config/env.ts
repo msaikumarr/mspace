@@ -1,5 +1,19 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
+import path from 'path';
 import { z } from 'zod';
+
+// Loads the repo-root .env regardless of the process's working directory. Plain `dotenv/config` looks in `process.cwd()`,
+// which breaks for `npm run dev:server` (cwd is server/, not the repo root where .env actually lives). __dirname is
+// server/src/config (or server/dist/config once built) either way, so three levels up is always the repo root. Harmless
+// if the file doesn't exist (e.g. in Docker/production, where real env vars are injected directly).
+//
+// Skipped entirely in tests: vitest.config.ts sets its own deliberately empty/fake values (no Stripe key, no OAuth, no
+// SMTP, ...) so every test run is isolated and reproducible. Loading a real developer .env here would leak whatever
+// live credentials happen to be sitting in it into the test suite - exactly the kind of cross-environment leak this
+// guard exists to prevent.
+if (process.env.NODE_ENV !== 'test') {
+  dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
+}
 
 // A `KEY=` line copied from .env.example arrives as '', which should mean "not set".
 const blankAsUnset = <T extends z.ZodTypeAny>(s: T) => z.preprocess((v) => (v === '' ? undefined : v), s);
