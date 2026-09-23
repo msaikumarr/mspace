@@ -86,9 +86,9 @@ fine demo on its own).
 
 ## 5. Verify
 
-Visit `https://<your-frontend-url>/api/health` — should return `{"status":"ok"}` (may take
-30-50s to respond on the very first hit while the free instance wakes up). Then open the
-site itself and sign in.
+Visit `https://<your-frontend-url>/api/health` — should return
+`{"success":true,"data":{"status":"ok",...}}` (may take 30-50s to respond on the very
+first hit while the free instance wakes up). Then open the site itself and sign in.
 
 ## Later: making it "real" instead of a demo
 
