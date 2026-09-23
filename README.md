@@ -35,6 +35,11 @@ docker compose up --build   # app at http://localhost:8080
 
 Services: `frontend` (nginx, serves the SPA and proxies `/api` and `/socket.io`), `backend`, `mongodb`, `redis`. Uploads persist in the `uploads` volume. For production, prefer managed MongoDB and Redis and point `MONGODB_URI` / `REDIS_URL` at them.
 
+## Deploying
+
+See [`DEPLOY.md`](./DEPLOY.md) for a free public-demo deployment on Render, using the same
+frontend/backend split as the Docker setup above (via [`render.yaml`](./render.yaml)).
+
 ## CI
 
 `.github/workflows/ci.yml` runs typecheck, tests and build for server and client, the Playwright end-to-end suite, and `docker compose build` on every push and pull request.

@@ -1,0 +1,80 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+#
+# Two services, both free tier:
+#   - backend:  a private service (no public URL of its own) running server/Dockerfile.
+#   - frontend: a public web service running client/Dockerfile (nginx), which proxies
+#               /api and /socket.io to the backend over Render's private network — the
+#               same same-origin-from-the-browser architecture already used and tested
+#               in docker-compose, so the refresh-token cookie's SameSite=Lax setting
+#               keeps working unchanged (no cross-origin cookie issues to work around).
+#
+# MongoDB isn't hosted by Render — use a free MongoDB Atlas (M0) cluster and paste its
+# connection string into MONGODB_URI below once the service exists. Redis is skipped
+# entirely for this demo tier; the app runs fine without it (in-memory queue/cache).
+#
+# Every `sync: false` value is a secret/credential and is intentionally left blank here —
+# Render will prompt for it once, in its dashboard, when you create this Blueprint. See
+# DEPLOY.md for exactly what to paste into each one.
+
+services:
+  - type: pserv
+    name: backend
+    runtime: docker
+    plan: free
+    dockerfilePath: ./server/Dockerfile
+    dockerContext: ./server
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: CLIENT_URL
+        sync: false # the frontend's public onrender.com URL — fill in after the frontend service is created
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_PRICE_PRO
+        sync: false
+      - key: STRIPE_PRICE_BUSINESS
+        sync: false
+      - key: OAUTH_GOOGLE_CLIENT_ID
+        sync: false
+      - key: OAUTH_GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: OAUTH_GITHUB_CLIENT_ID
+        sync: false
+      - key: OAUTH_GITHUB_CLIENT_SECRET
+        sync: false
+      - key: SMTP_URL
+        sync: false
+      - key: MAIL_FROM
+        value: "M-Space <no-reply@mspace.test>"
+      - key: TRANSCRIBE_API_KEY
+        sync: false
+      - key: TRANSCRIBE_BASE_URL
+        value: https://api.groq.com/openai/v1
+      - key: TRANSCRIBE_MODEL
+        value: whisper-large-v3-turbo
+
+  - type: web
+    name: frontend
+    runtime: docker
+    plan: free
+    dockerfilePath: ./client/Dockerfile
+    dockerContext: ./client
+    envVars:
+      - key: BACKEND_HOST
+        fromService:
+          name: backend
+          type: pserv
+          property: host
+      - key: BACKEND_PORT
+        fromService:
+          name: backend
+          type: pserv
+          property: port
