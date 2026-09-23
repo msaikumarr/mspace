@@ -6,10 +6,14 @@
 #               public onrender.com URL too, but that's harmless: no browser ever talks
 #               to it directly (see below), and every API route still requires auth.
 #   - frontend: a public web service running client/Dockerfile (nginx), which proxies
-#               /api and /socket.io to the backend over Render's private network - the
-#               same same-origin-from-the-browser architecture already used and tested
-#               in docker-compose, so the refresh-token cookie's SameSite=Lax setting
-#               keeps working unchanged (no cross-origin cookie issues to work around).
+#               /api and /socket.io to the backend's public URL over HTTPS - the same
+#               same-origin-from-the-browser architecture already used and tested in
+#               docker-compose (there, over the internal Docker network instead), so the
+#               refresh-token cookie's SameSite=Lax setting keeps working unchanged (no
+#               cross-origin cookie issues to work around). Not Render's private network:
+#               free-tier services can send private-network requests but not receive
+#               them, so the backend (also free-tier) isn't reachable that way - see
+#               BACKEND_URL below.
 #
 # MongoDB isn't hosted by Render — use a free MongoDB Atlas (M0) cluster and paste its
 # connection string into MONGODB_URI below once the service exists. Redis is skipped
@@ -71,13 +75,9 @@ services:
     dockerfilePath: ./client/Dockerfile
     dockerContext: ./client
     envVars:
-      - key: BACKEND_HOST
-        fromService:
-          name: backend
-          type: web
-          property: host
-      - key: BACKEND_PORT
-        fromService:
-          name: backend
-          type: web
-          property: port
+      # The backend's own public URL, e.g. https://backend-xxxx.onrender.com - copy it
+      # from the backend service's page once it's deployed and paste it in here (there's
+      # no Blueprint field for "a sibling service's public URL", only its private-network
+      # host/port, which free-tier services can't be reached on). See DEPLOY.md.
+      - key: BACKEND_URL
+        sync: false

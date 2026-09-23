@@ -32,7 +32,9 @@ Render doesn't host MongoDB, so the database lives elsewhere. MongoDB Atlas's fr
 1. Go to <https://dashboard.render.com/register> and sign up (GitHub sign-in is easiest
    since it can also grant repo access in the same step).
 2. **New** → **Blueprint**, connect the `msaikumarr/mspace` GitHub repo. Render reads
-   `render.yaml` and shows two services: `backend` (private) and `frontend` (public web).
+   `render.yaml` and shows two services: `backend` and `frontend` (both plain web
+   services — Render's free plan doesn't offer private services, and free web services
+   can't receive private-network traffic anyway, which is why step 3 below exists).
    (Render's Blueprint YAML schema occasionally renames a field between versions — if the
    dashboard flags a field in `render.yaml` as invalid, it will name the exact field and
    the fix is usually a one-word rename; tell me the error and I'll fix it.)
@@ -48,19 +50,24 @@ Render doesn't host MongoDB, so the database lives elsewhere. MongoDB Atlas's fr
      login/email/transcription too. **Except** `STRIPE_WEBHOOK_SECRET` — leave that one
      blank for now, it needs a new value from step 4 below (the old one only works for the
      Stripe CLI forwarding to your laptop).
-   - `CLIENT_URL` — also leave blank for now, filled in in step 3.
-4. Click **Apply**. Render builds both Docker images and deploys them. First build takes a
-   few minutes.
+   - `CLIENT_URL` and `BACKEND_URL` — leave both blank for now, filled in in step 3.
+4. Click **Apply**. Render builds both Docker images. `backend` should go **Live**.
+   `frontend` will fail its first deploy (`BACKEND_URL` isn't set yet) — that's expected,
+   fixed next.
 
-## 3. Wire the frontend URL back into the backend
+## 3. Point the frontend at the backend, and the backend at the frontend
 
-Once `frontend` is deployed, Render shows its public URL, something like
-`https://mspace-frontend.onrender.com`.
+Once `backend` shows **Live**, open it and copy its URL from the top of the page — something
+like `https://backend-xxxx.onrender.com`.
 
-1. Open the `backend` service → **Environment** → set `CLIENT_URL` to that URL
-   (no trailing slash) → save (this redeploys the backend).
+1. Open the `frontend` service → **Environment** → set `BACKEND_URL` to that URL, with
+   `https://` and no trailing slash (e.g. `https://backend-xxxx.onrender.com`) → save.
+   Render redeploys `frontend`; wait for it to go **Live**, then copy *its* URL too
+   (`https://frontend-xxxx.onrender.com` or similar).
+2. Open the `backend` service → **Environment** → set `CLIENT_URL` to the frontend's URL
+   (no trailing slash) → save (this redeploys the backend again).
 
-That URL is now the one link you share with people.
+The frontend's URL is now the one link you share with people.
 
 ## 4. If you carried over Stripe/OAuth/SMTP: point them at the new URL
 
