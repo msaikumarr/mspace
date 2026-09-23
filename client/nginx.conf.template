@@ -11,10 +11,14 @@ server {
   # can send but not receive private-network traffic, BACKEND_URL instead points at the
   # backend's public https:// URL - proxy_ssl_server_name sends correct SNI for that case
   # (harmless/unused when BACKEND_URL is a plain http:// address, as in local/CI).
+  #
+  # No `proxy_set_header Host` override: the app never reads the Host header, and on a
+  # host like Render, forwarding the frontend's own Host to a connection whose TLS SNI
+  # names the backend trips its edge's loop protection (508 Loop Detected). Leaving it
+  # unset makes nginx default to $proxy_host - the backend's own host:port - instead.
   location /api/ {
     proxy_pass ${BACKEND_URL};
     proxy_ssl_server_name on;
-    proxy_set_header Host $host;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
   }
@@ -25,7 +29,6 @@ server {
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";
-    proxy_set_header Host $host;
     proxy_read_timeout 3600s;
   }
 
