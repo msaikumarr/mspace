@@ -1,9 +1,12 @@
 # Render Blueprint — https://render.com/docs/blueprint-spec
 #
 # Two services, both free tier:
-#   - backend:  a private service (no public URL of its own) running server/Dockerfile.
+#   - backend:  runs server/Dockerfile. Private services (pserv) aren't available on
+#               Render's free plan, so this is a plain `web` service - it gets its own
+#               public onrender.com URL too, but that's harmless: no browser ever talks
+#               to it directly (see below), and every API route still requires auth.
 #   - frontend: a public web service running client/Dockerfile (nginx), which proxies
-#               /api and /socket.io to the backend over Render's private network — the
+#               /api and /socket.io to the backend over Render's private network - the
 #               same same-origin-from-the-browser architecture already used and tested
 #               in docker-compose, so the refresh-token cookie's SameSite=Lax setting
 #               keeps working unchanged (no cross-origin cookie issues to work around).
@@ -17,7 +20,7 @@
 # DEPLOY.md for exactly what to paste into each one.
 
 services:
-  - type: pserv
+  - type: web
     name: backend
     runtime: docker
     plan: free
@@ -71,10 +74,10 @@ services:
       - key: BACKEND_HOST
         fromService:
           name: backend
-          type: pserv
+          type: web
           property: host
       - key: BACKEND_PORT
         fromService:
           name: backend
-          type: pserv
+          type: web
           property: port
