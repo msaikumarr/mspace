@@ -7,7 +7,7 @@ test.describe('projects and Kanban', () => {
     await createProject(page, 'Website Relaunch');
 
     for (const title of ['Write copy', 'Design hero']) {
-      await page.getByRole('button', { name: '＋ New task' }).click();
+      await page.getByRole('button', { name: /New task/ }).click();
       const dialog = page.getByRole('dialog', { name: 'New task' });
       await dialog.getByLabel('Title').fill(title);
       await dialog.getByRole('button', { name: 'Create task' }).click();
@@ -42,7 +42,7 @@ test.describe('projects and Kanban', () => {
     await register(page, 'Commenter');
     await createProject(page, 'Support Queue');
 
-    await page.getByRole('button', { name: '＋ New task' }).click();
+    await page.getByRole('button', { name: /New task/ }).click();
     const dialog = page.getByRole('dialog', { name: 'New task' });
     await dialog.getByLabel('Title').fill('Investigate login bug');
     await dialog.getByLabel('Priority').selectOption('URGENT');
@@ -67,7 +67,7 @@ test.describe('projects and Kanban', () => {
   test('flags a past-due task as overdue on the board', async ({ page }) => {
     await register(page, 'Analyst');
     await createProject(page, 'Late Project');
-    await page.getByRole('button', { name: '＋ New task' }).click();
+    await page.getByRole('button', { name: /New task/ }).click();
     const dialog = page.getByRole('dialog', { name: 'New task' });
     await dialog.getByLabel('Title').fill('Should have shipped');
     await dialog.getByLabel('Due date').fill('2020-01-01');

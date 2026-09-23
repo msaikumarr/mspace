@@ -8,6 +8,26 @@ import { api, refreshSession } from '../services/api';
 import { useAuth } from '../store/auth';
 import { Button, ErrorBox, Field, Input } from '../components/ui';
 
+/** Neither brand mark is in lucide-react (it carries no brand/logo icons), so both are drawn directly. */
+function GitHubIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 16 16" fill="currentColor" aria-hidden>
+      <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+    </svg>
+  );
+}
+function GoogleIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" aria-hidden>
+      <path fill="#4285F4" d="M23.52 12.27c0-.85-.08-1.66-.22-2.45H12v4.64h6.48a5.6 5.6 0 0 1-2.4 3.62v3h3.87c2.27-2.09 3.57-5.17 3.57-8.81Z" />
+      <path fill="#34A853" d="M12 24c3.24 0 5.95-1.07 7.93-2.9l-3.87-3c-1.08.72-2.45 1.15-4.06 1.15-3.13 0-5.78-2.11-6.73-4.96H1.27v3.1A12 12 0 0 0 12 24Z" />
+      <path fill="#FBBC05" d="M5.27 14.29A7.2 7.2 0 0 1 4.89 12c0-.8.14-1.57.38-2.29V6.6H1.27A12 12 0 0 0 0 12c0 1.94.46 3.77 1.27 5.4Z" />
+      <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.94 1.19 15.24 0 12 0A12 12 0 0 0 1.27 6.6l4 3.11C6.22 6.86 8.87 4.75 12 4.75Z" />
+    </svg>
+  );
+}
+const SOCIAL_ICON: Record<string, ReactNode> = { google: <GoogleIcon className="h-[18px] w-[18px]" />, github: <GitHubIcon className="h-[18px] w-[18px] text-slate-900" /> };
+
 function Shell({ title, subtitle, children, footer }: { title: string; subtitle: string; children: ReactNode; footer: ReactNode }) {
   return (
     <div className="flex min-h-full items-center justify-center bg-gradient-to-br from-brand-50 via-white to-slate-100 px-4 py-10">
@@ -38,8 +58,6 @@ const OAUTH_ERRORS: Record<string, string> = {
 };
 export const oauthMessage = (code: string | null) => (code ? OAUTH_ERRORS[code] || 'Sign-in failed. Please try again.' : null);
 
-const BRAND: Record<string, string> = { google: 'text-[#4285F4]', github: 'text-slate-900' };
-
 /** "Continue with …" for each provider the server has configured; renders nothing when there are none. */
 function SocialButtons({ verb, returnTo }: { verb: string; returnTo?: string }) {
   const [params] = useSearchParams();
@@ -56,8 +74,8 @@ function SocialButtons({ verb, returnTo }: { verb: string; returnTo?: string }) 
           <div className="space-y-2">
             {list.map((p) => (
               // a full-page navigation: the provider redirects back to the server, which then sends the browser into the app
-              <a key={p.id} href={`/api/auth/oauth/${p.id}/start${q}`} className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-                <span aria-hidden className={`text-base font-bold ${BRAND[p.id] || ''}`}>{p.name[0]}</span>{verb} with {p.name}
+              <a key={p.id} href={`/api/auth/oauth/${p.id}/start${q}`} className="flex w-full items-center justify-center gap-2.5 rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                {SOCIAL_ICON[p.id]}{verb} with {p.name}
               </a>
             ))}
           </div>

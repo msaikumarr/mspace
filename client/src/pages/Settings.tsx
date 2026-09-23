@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Lock } from 'lucide-react';
 import { api, get, patch, post } from '../services/api';
 import { useAuth, useWorkspace } from '../store/auth';
 import { useWsKey } from '../hooks/useData';
@@ -154,7 +155,7 @@ function AuditLog() {
   const [action, setAction] = useState('');
   const q = useQuery({ queryKey: key('audit', action), queryFn: () => get<any[]>(`/audit-logs${action ? `?action=${action}` : ''}`), retry: false });
   if (q.isLoading) return <Loading />;
-  if (q.error) return <Card className="p-8 text-center"><p className="text-2xl">🔒</p><p className="mt-1 font-semibold">Audit logs</p><p className="mx-auto mt-1 max-w-md text-sm text-slate-500">{(q.error as Error).message}</p><a href="/app/billing"><Button className="mt-4">See plans</Button></a></Card>;
+  if (q.error) return <Card className="p-8 text-center"><Lock className="mx-auto h-6 w-6 text-slate-400" strokeWidth={1.75} /><p className="mt-1 font-semibold">Audit logs</p><p className="mx-auto mt-1 max-w-md text-sm text-slate-500">{(q.error as Error).message}</p><a href="/app/billing"><Button className="mt-4">See plans</Button></a></Card>;
   const actions = ['USER_INVITED', 'ROLE_CHANGED', 'MEMBER_REMOVED', 'PROJECT_CREATED', 'PROJECT_DELETED', 'TASK_CREATED', 'TASK_DELETED', 'DOCUMENT_UPLOADED', 'DOCUMENT_DELETED', 'SUBSCRIPTION_CHANGED', 'AI_TASKS_APPROVED'];
   return (
     <div>

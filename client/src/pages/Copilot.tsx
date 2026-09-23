@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { HelpCircle, Plus, Sparkles, User, X } from 'lucide-react';
 import { del, get, post } from '../services/api';
 import { useProjects, useWsKey } from '../hooks/useData';
 import { useRoleAtLeast } from '../store/auth';
@@ -43,11 +44,11 @@ function ChatTab() {
   return (
     <div className="grid gap-5 lg:grid-cols-[220px_1fr]">
       <aside className="space-y-1">
-        <Button variant="secondary" className="mb-2 w-full" onClick={() => { setConvId(null); setTurns([]); }}>＋ New chat</Button>
+        <Button variant="secondary" className="mb-2 w-full" onClick={() => { setConvId(null); setTurns([]); }}><Plus className="h-4 w-4" /> New chat</Button>
         {convos.data?.map((c) => (
           <div key={c.id} className={cn('group flex items-center justify-between rounded-lg px-2.5 py-2 text-sm hover:bg-slate-100', c.id === convId && 'bg-brand-50')}>
             <button onClick={() => open(c.id)} className="min-w-0 flex-1 truncate text-left text-slate-700">{c.title}<span className="block text-[11px] text-slate-400">{timeAgo(c.updatedAt)}</span></button>
-            <button aria-label="Delete conversation" onClick={() => del(`/ai/conversations/${c.id}`).then(() => { qc.invalidateQueries({ queryKey: key('ai-convos') }); if (c.id === convId) { setConvId(null); setTurns([]); } })} className="hidden text-slate-400 hover:text-red-500 group-hover:block">✕</button>
+            <button aria-label="Delete conversation" onClick={() => del(`/ai/conversations/${c.id}`).then(() => { qc.invalidateQueries({ queryKey: key('ai-convos') }); if (c.id === convId) { setConvId(null); setTurns([]); } })} className="hidden text-slate-400 hover:text-red-500 group-hover:block"><X className="h-3.5 w-3.5" /></button>
           </div>
         ))}
       </aside>
@@ -55,7 +56,7 @@ function ChatTab() {
         <div className="flex-1 space-y-4 overflow-y-auto p-5">
           {turns.length === 0 && (
             <div className="py-8 text-center">
-              <div className="text-4xl">✨</div>
+              <Sparkles className="mx-auto h-8 w-8 text-brand-500" strokeWidth={1.5} />
               <h2 className="mt-2 font-semibold text-slate-800">Ask anything about your workspace</h2>
               <p className="mx-auto mt-1 max-w-md text-sm text-slate-500">The Copilot sees your projects, tasks and (on Pro+) uploaded documents. Answers cite their sources.</p>
               <div className="mt-5 flex flex-wrap justify-center gap-2">{SUGGESTIONS.map((s) => <button key={s} onClick={() => ask(s)} disabled={!canUse} className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-600 hover:border-brand-300 hover:text-brand-700 disabled:opacity-50">{s}</button>)}</div>
@@ -114,10 +115,10 @@ function TasksTab() {
         <Field label="From a document"><Select value={documentId} onChange={(e) => setDocumentId(e.target.value)}><option value="">— paste text below instead —</option>{ready.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}</Select></Field>
         {!documentId && <Textarea rows={6} value={text} onChange={(e) => setText(e.target.value)} placeholder="- The system must support SSO&#10;- Send weekly digest emails by Friday…" />}
         <ErrorBox error={gen.error} />
-        <Button onClick={() => gen.mutate()} loading={gen.isPending} disabled={!documentId && text.trim().length < 10}>✨ Suggest tasks</Button>
+        <Button onClick={() => gen.mutate()} loading={gen.isPending} disabled={!documentId && text.trim().length < 10}><Sparkles className="h-4 w-4" /> Suggest tasks</Button>
       </Card>
 
-      {cands && (cands.length === 0 ? <Empty title="No actionable tasks found" hint="Try text with requirements like “must…”, “should…” or action verbs." icon="🤔" /> : (
+      {cands && (cands.length === 0 ? <Empty title="No actionable tasks found" hint="Try text with requirements like “must…”, “should…” or action verbs." icon={HelpCircle} /> : (
         <Card className="p-5">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h3 className="font-semibold">Review {cands.length} suggestion{cands.length > 1 ? 's' : ''}</h3>
@@ -135,7 +136,7 @@ function TasksTab() {
                   <Input value={c.title} onChange={(e) => edit(i, { title: e.target.value })} className="font-medium" />
                   <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
                     <Select className="w-28 py-1 text-xs" value={c.priority} onChange={(e) => edit(i, { priority: e.target.value as Candidate['priority'] })}>{['LOW', 'MEDIUM', 'HIGH', 'URGENT'].map((p) => <option key={p}>{p}</option>)}</Select>
-                    {c.assigneeName && <Badge tone="brand">👤 {c.assigneeName}</Badge>}
+                    {c.assigneeName && <Badge tone="brand" className="inline-flex items-center gap-1"><User className="h-3 w-3" />{c.assigneeName}</Badge>}
                     {c.dueDate && <Badge tone="amber">Due {fmtDate(c.dueDate, true)}</Badge>}
                     <Badge tone={priorityTone(c.priority) as any}>{c.priority}</Badge>
                   </div>
@@ -163,7 +164,7 @@ function InsightsTab() {
       <ErrorBox error={m.error} />
       {m.isPending && !m.data ? <Loading label="Analysing work…" /> : m.data && (
         <>
-          <Card className="border-brand-200 bg-brand-50/50 p-5"><p className="text-sm text-slate-700">✨ {m.data.narrative}</p><p className="mt-2 text-xs text-slate-400">Decision-support only — these signals describe work items, not people's performance.</p></Card>
+          <Card className="border-brand-200 bg-brand-50/50 p-5"><p className="flex items-start gap-2 text-sm text-slate-700"><Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" />{m.data.narrative}</p><p className="mt-2 text-xs text-slate-400">Decision-support only — these signals describe work items, not people's performance.</p></Card>
           <div className="space-y-3">
             {m.data.items.map((it: any, i: number) => (
               <Card key={i} className="p-4">

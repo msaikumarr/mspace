@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Plus, Search, Sparkles, FolderX } from 'lucide-react';
 import { del, get, patch } from '../services/api';
 import { useMembers, useTasks, useWsKey } from '../hooks/useData';
 import { useRoleAtLeast } from '../store/auth';
@@ -30,7 +31,7 @@ function TaskCard({ t, byId, canDrag, onOpen, onDragStart, onDragOverCard }: any
       <p className="text-sm font-medium text-slate-800">{t.title}</p>
       {t.labels.length > 0 && <div className="mt-1.5 flex flex-wrap gap-1">{t.labels.map((l: string) => <Badge key={l} tone={/block/i.test(l) ? 'red' : 'slate'}>{l}</Badge>)}</div>}
       <div className="mt-2.5 flex items-center justify-between">
-        <div className="flex items-center gap-1.5"><Badge tone={priorityTone(t.priority) as any}>{t.priority}</Badge>{t.source !== 'manual' && <span title={t.source === 'ai' ? 'AI-suggested' : 'From meeting'}>✨</span>}</div>
+        <div className="flex items-center gap-1.5"><Badge tone={priorityTone(t.priority) as any}>{t.priority}</Badge>{t.source !== 'manual' && <span title={t.source === 'ai' ? 'AI-suggested' : 'From meeting'}><Sparkles className="h-3.5 w-3.5 text-brand-500" /></span>}</div>
         <div className="flex items-center gap-2">
           {t.dueDate && <span className={cn('text-[11px]', overdue ? 'font-semibold text-red-600' : 'text-slate-400')}>{overdue ? 'Overdue · ' : ''}{fmtDate(t.dueDate)}</span>}
           {a && <Avatar name={a.name} color={a.avatarColor} size={22} />}
@@ -82,7 +83,7 @@ function Board({ tasks, onOpen, onAdd }: { tasks: Task[]; onOpen: (id: string) =
         >
           <div className="mb-2 flex items-center justify-between px-1">
             <h3 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600"><span className={cn('h-2 w-2 rounded-full', COL_TONE[s])} />{statusLabel(s)}<span className="rounded-full bg-white px-1.5 text-[11px] text-slate-500">{cols[s].length}</span></h3>
-            {canEdit && <button onClick={() => onAdd(s)} className="rounded p-1 text-slate-400 hover:bg-white hover:text-brand-600" aria-label={`Add task to ${statusLabel(s)}`}>＋</button>}
+            {canEdit && <button onClick={() => onAdd(s)} className="rounded p-1 text-slate-400 hover:bg-white hover:text-brand-600" aria-label={`Add task to ${statusLabel(s)}`}><Plus className="h-4 w-4" /></button>}
           </div>
           <div className="min-h-[60px] flex-1 space-y-2">
             {cols[s].map((t) => <TaskCard key={t.id} t={t} byId={byId} canDrag={canEdit} onOpen={() => onOpen(t.id)} onDragStart={setDragId} onDragOverCard={setOverCard} />)}
@@ -96,7 +97,7 @@ function Board({ tasks, onOpen, onAdd }: { tasks: Task[]; onOpen: (id: string) =
 
 function ListView({ tasks, onOpen }: { tasks: Task[]; onOpen: (id: string) => void }) {
   const { byId } = useMembers();
-  if (!tasks.length) return <Empty title="No tasks match" hint="Try clearing filters or add a task." icon="🔍" />;
+  if (!tasks.length) return <Empty title="No tasks match" hint="Try clearing filters or add a task." icon={Search} />;
   return (
     <Card className="overflow-x-auto">
       <table className="w-full text-sm">
@@ -171,7 +172,7 @@ export default function ProjectDetail() {
     (!filters.priority || t.priority === filters.priority)), [tasks.data, filters]);
 
   if (project.isLoading) return <Loading />;
-  if (project.error || !project.data) return <Empty title="Project not found" hint="It may have been deleted, or you may not have access." icon="🗂️" action={<Link to="/app/projects"><Button variant="secondary">Back to projects</Button></Link>} />;
+  if (project.error || !project.data) return <Empty title="Project not found" hint="It may have been deleted, or you may not have access." icon={FolderX} action={<Link to="/app/projects"><Button variant="secondary">Back to projects</Button></Link>} />;
   const p = project.data;
   const total = tasks.data?.length || 0;
   const done = tasks.data?.filter((t) => t.status === 'DONE').length || 0;
@@ -184,7 +185,7 @@ export default function ProjectDetail() {
         subtitle={p.description || undefined}
         actions={<>
           {canEditProject && <Button variant="secondary" onClick={() => setEditing(true)}>Edit</Button>}
-          {canCreate && <Button onClick={() => setCreating('TODO')}>＋ New task</Button>}
+          {canCreate && <Button onClick={() => setCreating('TODO')}><Plus className="h-4 w-4" /> New task</Button>}
         </>}
       />
       <div className="mb-5 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-slate-500">

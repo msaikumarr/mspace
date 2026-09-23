@@ -1,14 +1,15 @@
 import { Link } from 'react-router-dom';
+import { Kanban, MessageSquare, FileText, Sparkles, Mic, BarChart3, ShieldCheck, Check } from 'lucide-react';
 import { useAuth } from '../store/auth';
 
 const FEATURES = [
-  ['📋', 'Projects & Kanban', 'Plan work with boards, priorities, due dates and live drag-and-drop that syncs to everyone instantly.'],
-  ['💬', 'Team chat', 'Channels, DMs, threads-lite replies, reactions, mentions and typing indicators — no extra app needed.'],
-  ['📄', 'Document knowledge base', 'Upload PDFs, Word and Markdown. Ask questions and get answers with the exact page as the source.'],
-  ['✨', 'AI Copilot', 'Summarise projects, find overdue work, decide what to do next, and turn requirements into tasks you approve.'],
-  ['🎙️', 'Meeting assistant', 'Paste a transcript and get a summary, decisions, deadlines and reviewable action items.'],
-  ['📊', 'Analytics & insights', 'Completion rate, workload, weekly throughput and explainable signals on where to look.'],
-  ['🔐', 'Multi-tenant & secure', 'Workspace isolation enforced on the server, role-based access, audit logs and plan-based limits.'],
+  [Kanban, 'Projects & Kanban', 'Plan work with boards, priorities, due dates and live drag-and-drop that syncs to everyone instantly.'],
+  [MessageSquare, 'Team chat', 'Channels, DMs, threads-lite replies, reactions, mentions and typing indicators — no extra app needed.'],
+  [FileText, 'Document knowledge base', 'Upload PDFs, Word and Markdown. Ask questions and get answers with the exact page as the source.'],
+  [Sparkles, 'AI Copilot', 'Summarise projects, find overdue work, decide what to do next, and turn requirements into tasks you approve.'],
+  [Mic, 'Meeting assistant', 'Paste a transcript and get a summary, decisions, deadlines and reviewable action items.'],
+  [BarChart3, 'Analytics & insights', 'Completion rate, workload, weekly throughput and explainable signals on where to look.'],
+  [ShieldCheck, 'Multi-tenant & secure', 'Workspace isolation enforced on the server, role-based access, audit logs and plan-based limits.'],
 ] as const;
 
 const PLANS = [
@@ -21,7 +22,7 @@ export default function Landing() {
   const user = useAuth((s) => s.user);
   return (
     <div className="min-h-full bg-white">
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
+      <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
         <span className="flex items-center gap-2 text-lg font-bold"><span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-white">M</span> M-Space</span>
         <nav className="flex items-center gap-3 text-sm">
           {user ? <Link to="/app" className="rounded-lg bg-brand-600 px-4 py-2 font-medium text-white hover:bg-brand-700">Open app</Link> : (
@@ -48,9 +49,9 @@ export default function Landing() {
       <section id="features" className="mx-auto max-w-6xl px-5 py-16">
         <h2 className="text-center text-2xl font-bold text-slate-900">Everything a team needs</h2>
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {FEATURES.map(([icon, t, d]) => (
+          {FEATURES.map(([Icon, t, d]) => (
             <div key={t} className="rounded-xl border border-slate-200 p-5">
-              <div className="text-2xl">{icon}</div>
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-50 text-brand-600"><Icon className="h-5 w-5" strokeWidth={1.75} /></div>
               <h3 className="mt-3 font-semibold text-slate-900">{t}</h3>
               <p className="mt-1 text-sm text-slate-600">{d}</p>
             </div>
@@ -66,7 +67,7 @@ export default function Landing() {
               <div key={name} className={`rounded-xl border bg-white p-6 ${hot ? 'border-brand-500 ring-2 ring-brand-200' : 'border-slate-200'}`}>
                 <h3 className="font-semibold">{name}</h3>
                 <p className="mt-2 text-3xl font-bold">{price}<span className="text-sm font-normal text-slate-500">/mo</span></p>
-                <ul className="mt-4 space-y-2 text-sm text-slate-600">{items.map((i) => <li key={i}>✓ {i}</li>)}</ul>
+                <ul className="mt-4 space-y-2 text-sm text-slate-600">{items.map((i) => <li key={i} className="flex items-center gap-2"><Check className="h-4 w-4 shrink-0 text-brand-600" strokeWidth={2.25} />{i}</li>)}</ul>
               </div>
             ))}
           </div>

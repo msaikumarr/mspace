@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { FolderOpen, Plus } from 'lucide-react';
 import { post } from '../services/api';
 import { useProjects } from '../hooks/useData';
 import { useRoleAtLeast } from '../store/auth';
@@ -22,9 +23,9 @@ export default function Projects() {
 
   return (
     <div>
-      <PageHeader title="Projects" subtitle="Every task, file and conversation lives inside a project." actions={canCreate && <Button onClick={() => setOpen(true)}>＋ New project</Button>} />
+      <PageHeader title="Projects" subtitle="Every task, file and conversation lives inside a project." actions={canCreate && <Button onClick={() => setOpen(true)}><Plus className="h-4 w-4" /> New project</Button>} />
       {projects.isLoading ? <Loading /> : !projects.data?.length ? (
-        <Empty title="No projects yet" icon="📁" hint={canCreate ? 'Create your first project to start planning work.' : 'A manager or admin needs to create a project.'} action={canCreate && <Button onClick={() => setOpen(true)}>Create project</Button>} />
+        <Empty title="No projects yet" icon={FolderOpen} hint={canCreate ? 'Create your first project to start planning work.' : 'A manager or admin needs to create a project.'} action={canCreate && <Button onClick={() => setOpen(true)}>Create project</Button>} />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {projects.data.map((p) => {

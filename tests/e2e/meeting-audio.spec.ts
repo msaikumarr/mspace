@@ -56,7 +56,7 @@ test.describe('meeting recordings', () => {
 
     // the meeting list marks it as a recording
     await page.keyboard.press('Escape');
-    await expect(page.getByText(/🎙 recording/)).toBeVisible();
+    await expect(page.getByText(/recording · \d/)).toBeVisible(); // the subtitle also contains "recording", but not followed by "· <count>"
     await expect(page.getByText('Ready', { exact: true })).toBeVisible();
   });
 

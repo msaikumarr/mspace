@@ -1,5 +1,6 @@
 import { ReactNode, ButtonHTMLAttributes, InputHTMLAttributes, TextareaHTMLAttributes, SelectHTMLAttributes, forwardRef, useEffect } from 'react';
 import { create } from 'zustand';
+import { Inbox, X, type LucideIcon } from 'lucide-react';
 import { cn, initials } from '../utils';
 import { ApiError } from '../services/api';
 
@@ -84,10 +85,10 @@ export function Spinner({ className }: { className?: string }) {
 }
 export const Loading = ({ label = 'Loading…' }: { label?: string }) => <div className="flex items-center justify-center gap-2 py-16 text-sm text-slate-500"><Spinner />{label}</div>;
 
-export function Empty({ title, hint, action, icon = '📭' }: { title: string; hint?: string; action?: ReactNode; icon?: string }) {
+export function Empty({ title, hint, action, icon: Icon = Inbox }: { title: string; hint?: string; action?: ReactNode; icon?: LucideIcon }) {
   return (
     <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white/60 px-6 py-12 text-center">
-      <div className="mb-2 text-3xl">{icon}</div>
+      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400"><Icon className="h-6 w-6" strokeWidth={1.75} /></div>
       <p className="font-medium text-slate-700">{title}</p>
       {hint && <p className="mt-1 max-w-sm text-sm text-slate-500">{hint}</p>}
       {action && <div className="mt-4">{action}</div>}
@@ -120,7 +121,7 @@ export function Modal({ open, onClose, title, children, wide }: { open: boolean;
       <div role="dialog" aria-modal="true" aria-label={title} className={cn('animate-in w-full rounded-2xl bg-white shadow-xl', wide ? 'max-w-3xl' : 'max-w-md')}>
         <div className="flex items-center justify-between border-b border-slate-100 px-5 py-3.5">
           <h2 className="font-semibold text-slate-900">{title}</h2>
-          <button onClick={onClose} aria-label="Close" className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600">✕</button>
+          <button onClick={onClose} aria-label="Close" className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"><X className="h-4 w-4" /></button>
         </div>
         <div className="p-5">{children}</div>
       </div>

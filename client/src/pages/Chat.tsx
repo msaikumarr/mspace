@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { CornerUpLeft, Paperclip, Plus, X } from 'lucide-react';
 import { api, del, download, get, patch, post } from '../services/api';
 import { connectSocket, getSocket } from '../services/socket';
 import { useMembers, useWsKey } from '../hooks/useData';
@@ -138,7 +139,7 @@ export default function Chat() {
   return (
     <div className="-m-4 flex h-[calc(100vh-3.5rem)] sm:-m-6 lg:h-screen">
       <aside className="hidden w-60 shrink-0 overflow-y-auto border-r border-slate-200 bg-white p-3 md:block">
-        <div className="mb-1 flex items-center justify-between px-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Channels{canWrite && <button onClick={() => setNewChannel(true)} className="text-base text-slate-400 hover:text-brand-600" aria-label="New channel">＋</button>}</div>
+        <div className="mb-1 flex items-center justify-between px-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Channels{canWrite && <button onClick={() => setNewChannel(true)} className="text-slate-400 hover:text-brand-600" aria-label="New channel"><Plus className="h-3.5 w-3.5" /></button>}</div>
         {channelList.map((c) => (
           <button key={c.id} onClick={() => setSp({ channel: c.id })} className={cn('flex w-full items-center justify-between rounded-md px-2 py-1.5 text-left text-sm', c.id === activeId ? 'bg-brand-100 font-medium text-brand-700' : 'text-slate-600 hover:bg-slate-100')}>
             <span># {c.name}</span>{c.unread > 0 && <span className="rounded-full bg-brand-600 px-1.5 text-[10px] font-bold text-white">{c.unread}</span>}
@@ -153,7 +154,7 @@ export default function Chat() {
         ))}
         {canWrite && (
           <details className="mt-2 px-1">
-            <summary className="cursor-pointer px-1 py-1 text-xs text-brand-600">＋ Start a conversation</summary>
+            <summary className="flex cursor-pointer items-center gap-1 px-1 py-1 text-xs text-brand-600"><Plus className="h-3 w-3" />Start a conversation</summary>
             {members.filter((m) => m.user.id !== me.id).map((m) => (
               <button key={m.user.id} onClick={() => openDm.mutate(m.user.id)} className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm text-slate-600 hover:bg-slate-100">
                 <Avatar name={m.user.name} color={m.user.avatarColor} size={20} online={online.has(m.user.id)} />{m.user.name}
@@ -176,7 +177,7 @@ export default function Chat() {
               </select>
             </header>
             <div className="flex-1 space-y-1 overflow-y-auto px-5 py-4">
-              {messages.isLoading ? <Loading /> : messages.data?.length === 0 ? <p className="py-10 text-center text-sm text-slate-400">No messages yet — say hello 👋</p> : messages.data?.map((m, i, arr) => {
+              {messages.isLoading ? <Loading /> : messages.data?.length === 0 ? <p className="py-10 text-center text-sm text-slate-400">No messages yet — say hello</p> : messages.data?.map((m, i, arr) => {
                 const u = m.user || byId.get(m.userId);
                 const showDay = i === 0 || fmtDate(arr[i - 1].createdAt) !== fmtDate(m.createdAt);
                 const grouped = i > 0 && !showDay && arr[i - 1].userId === m.userId && new Date(m.createdAt).getTime() - new Date(arr[i - 1].createdAt).getTime() < 5 * 60_000 && !m.replyTo;
@@ -189,13 +190,13 @@ export default function Chat() {
                       <div className="w-8 shrink-0">{!grouped && <Avatar name={u?.name} color={u?.avatarColor} size={32} online={online.has(m.userId)} />}</div>
                       <div className="min-w-0 flex-1">
                         {!grouped && <p className="text-sm"><span className="font-semibold text-slate-800">{u?.name || 'Former member'}</span> <span className="ml-1 text-xs text-slate-400">{fmtTime(m.createdAt)}</span></p>}
-                        {parent && <p className="mb-0.5 truncate border-l-2 border-slate-300 pl-2 text-xs text-slate-400">↪ {byId.get(parent.userId)?.name}: {parent.deleted ? 'deleted message' : parent.text}</p>}
+                        {parent && <p className="mb-0.5 flex items-center gap-1 truncate border-l-2 border-slate-300 pl-2 text-xs text-slate-400"><CornerUpLeft className="h-3 w-3 shrink-0" />{byId.get(parent.userId)?.name}: {parent.deleted ? 'deleted message' : parent.text}</p>}
                         {m.deleted ? <p className="text-sm italic text-slate-400">This message was deleted</p> : editing?.id === m.id ? (
                           <form onSubmit={(e) => { e.preventDefault(); saveEdit.mutate(); }} className="flex gap-2"><Input autoFocus value={editing.text} onChange={(e) => setEditing({ ...editing, text: e.target.value })} /><Button size="sm" type="submit">Save</Button><Button size="sm" variant="ghost" type="button" onClick={() => setEditing(null)}>Cancel</Button></form>
                         ) : (
                           <p className="whitespace-pre-wrap break-words text-sm text-slate-700">{m.text}{m.editedAt && <span className="ml-1 text-[11px] text-slate-400">(edited)</span>}</p>
                         )}
-                        {m.attachment && !m.deleted && <button onClick={() => download(m.attachment!.url.replace('/api', ''), m.attachment!.name).catch(toast.error)} className="mt-1 inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-brand-700 hover:bg-slate-50">📎 {m.attachment.name}</button>}
+                        {m.attachment && !m.deleted && <button onClick={() => download(m.attachment!.url.replace('/api', ''), m.attachment!.name).catch(toast.error)} className="mt-1 inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-brand-700 hover:bg-slate-50"><Paperclip className="h-3.5 w-3.5" />{m.attachment.name}</button>}
                         {m.reactions?.length > 0 && !m.deleted && (
                           <div className="mt-1 flex flex-wrap gap-1">{m.reactions.map((r) => (
                             <button key={r.emoji} onClick={() => canWrite && react.mutate({ id: m.id, emoji: r.emoji })} className={cn('rounded-full border px-2 py-0.5 text-xs', r.userIds.includes(me.id) ? 'border-brand-300 bg-brand-50' : 'border-slate-200 bg-white')}>{r.emoji} {r.userIds.length}</button>
@@ -218,12 +219,12 @@ export default function Chat() {
             </div>
             <div className="border-t border-slate-200 p-3">
               <div className="h-4 px-1 text-xs italic text-slate-400" aria-live="polite">{typers.length > 0 && `${typers.join(', ')} ${typers.length > 1 ? 'are' : 'is'} typing…`}</div>
-              {replyTo && <div className="mb-2 flex items-center justify-between rounded-lg bg-slate-50 px-3 py-1.5 text-xs text-slate-500"><span className="truncate">Replying to <b>{byId.get(replyTo.userId)?.name}</b>: {replyTo.text}</span><button onClick={() => setReplyTo(null)} aria-label="Cancel reply">✕</button></div>}
-              {attached && <div className="mb-2 flex items-center justify-between rounded-lg bg-brand-50 px-3 py-1.5 text-xs text-brand-700"><span>📎 {attached.name}</span><button onClick={() => setAttached(null)} aria-label="Remove attachment">✕</button></div>}
+              {replyTo && <div className="mb-2 flex items-center justify-between rounded-lg bg-slate-50 px-3 py-1.5 text-xs text-slate-500"><span className="truncate">Replying to <b>{byId.get(replyTo.userId)?.name}</b>: {replyTo.text}</span><button onClick={() => setReplyTo(null)} aria-label="Cancel reply"><X className="h-3.5 w-3.5" /></button></div>}
+              {attached && <div className="mb-2 flex items-center justify-between rounded-lg bg-brand-50 px-3 py-1.5 text-xs text-brand-700"><span className="flex items-center gap-1.5"><Paperclip className="h-3.5 w-3.5" />{attached.name}</span><button onClick={() => setAttached(null)} aria-label="Remove attachment"><X className="h-3.5 w-3.5" /></button></div>}
               {canWrite ? (
                 <form onSubmit={(e) => { e.preventDefault(); if (text.trim() || attached) send.mutate(); }} className="flex gap-2">
                   <input ref={file} type="file" hidden onChange={(e) => { setAttached(e.target.files?.[0] || null); e.target.value = ''; }} />
-                  <Button type="button" variant="secondary" onClick={() => file.current?.click()} aria-label="Attach file">📎</Button>
+                  <Button type="button" variant="secondary" onClick={() => file.current?.click()} aria-label="Attach file"><Paperclip className="h-4 w-4" /></Button>
                   <Input value={text} onChange={(e) => onType(e.target.value)} placeholder={`Message ${active?.type === 'dm' ? dmName(active) : '#' + (active?.name || '')}`} maxLength={8000} aria-label="Message" />
                   <Button type="submit" loading={send.isPending} disabled={!text.trim() && !attached}>Send</Button>
                 </form>

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { Sparkles, Target } from 'lucide-react';
 import { get } from '../services/api';
 import { useProjects, useTasks, useWsKey } from '../hooks/useData';
 import { useAuth, useRoleAtLeast, useWorkspace } from '../store/auth';
@@ -25,7 +26,7 @@ export default function Overview() {
 
   return (
     <div>
-      <PageHeader title={`${greet}, ${user.name.split(' ')[0]} 👋`} subtitle={`Here's what's happening in ${ws.name}.`} />
+      <PageHeader title={`${greet}, ${user.name.split(' ')[0]}`} subtitle={`Here's what's happening in ${ws.name}.`} />
       {!projects.data?.length && (
         <Card className="mb-6 border-brand-200 bg-brand-50/60 p-6">
           <h2 className="font-semibold text-slate-900">Get started in three steps</h2>
@@ -45,8 +46,8 @@ export default function Overview() {
       </div>
       <div className="grid gap-5 lg:grid-cols-5">
         <Card className="p-5 lg:col-span-3">
-          <div className="mb-3 flex items-center justify-between"><h2 className="font-semibold">Your focus</h2><Link to="/app/copilot" className="text-sm text-brand-600 hover:underline">Ask Copilot ✨</Link></div>
-          {focus.length === 0 ? <Empty icon="🎯" title="Nothing assigned to you" hint="Tasks assigned to you appear here, sorted by priority and due date." /> : (
+          <div className="mb-3 flex items-center justify-between"><h2 className="font-semibold">Your focus</h2><Link to="/app/copilot" className="inline-flex items-center gap-1 text-sm text-brand-600 hover:underline">Ask Copilot <Sparkles className="h-3.5 w-3.5" /></Link></div>
+          {focus.length === 0 ? <Empty icon={Target} title="Nothing assigned to you" hint="Tasks assigned to you appear here, sorted by priority and due date." /> : (
             <ul className="divide-y divide-slate-100">
               {focus.map((task) => (
                 <li key={task.id}><Link to={`/app/projects/${task.projectId}?task=${task.id}`} className="flex items-center gap-3 py-2.5 hover:bg-slate-50">

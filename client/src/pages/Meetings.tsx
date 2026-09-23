@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Lock, Mic, Plus, Trash2 } from 'lucide-react';
 import { api, del, get, post } from '../services/api';
 import { useMembers, useProjects, useWsKey } from '../hooks/useData';
 import { useBilling } from '../hooks/useData';
@@ -107,17 +108,17 @@ export default function Meetings() {
     setF((p) => ({ title: p.title || file.name.replace(/\.[^.]+$/, ''), transcript }));
   };
 
-  if (locked) return <div><PageHeader title="Meeting assistant" /><Empty icon="🔒" title="Meeting assistant is a Pro feature" hint="Turn transcripts into summaries, decisions and reviewable action items." action={<a href="/app/billing"><Button>See plans</Button></a>} /></div>;
+  if (locked) return <div><PageHeader title="Meeting assistant" /><Empty icon={Lock} title="Meeting assistant is a Pro feature" hint="Turn transcripts into summaries, decisions and reviewable action items." action={<a href="/app/billing"><Button>See plans</Button></a>} /></div>;
   return (
     <div>
-      <PageHeader title="Meeting assistant" subtitle={`${audio ? 'Paste a transcript or upload a recording' : 'Paste a transcript'}. Get a summary, decisions, deadlines and action items you approve before they become tasks.`} actions={<Button onClick={() => setOpen(true)}>＋ New meeting</Button>} />
-      {list.isLoading ? <Loading /> : !list.data?.length ? <Empty icon="🎙️" title="No meetings yet" hint={audio ? 'Upload a recording, or paste a transcript from Zoom or Meet.' : "Audio transcription isn't set up on this server. Paste text from your recorder, Zoom or Meet transcript."} action={<Button onClick={() => setOpen(true)}>{audio ? 'Add a meeting' : 'Add a transcript'}</Button>} /> : (
+      <PageHeader title="Meeting assistant" subtitle={`${audio ? 'Paste a transcript or upload a recording' : 'Paste a transcript'}. Get a summary, decisions, deadlines and action items you approve before they become tasks.`} actions={<Button onClick={() => setOpen(true)}><Plus className="h-4 w-4" /> New meeting</Button>} />
+      {list.isLoading ? <Loading /> : !list.data?.length ? <Empty icon={Mic} title="No meetings yet" hint={audio ? 'Upload a recording, or paste a transcript from Zoom or Meet.' : "Audio transcription isn't set up on this server. Paste text from your recorder, Zoom or Meet transcript."} action={<Button onClick={() => setOpen(true)}>{audio ? 'Add a meeting' : 'Add a transcript'}</Button>} /> : (
         <Card className="divide-y divide-slate-100">
           {list.data.map((m) => (
             <div key={m.id} className="flex items-center gap-3 px-4 py-3">
-              <button onClick={() => setDetail(m.id)} className="min-w-0 flex-1 text-left"><p className="truncate text-sm font-medium text-slate-800">{m.title}</p><p className="text-xs text-slate-400">{timeAgo(m.createdAt)}{m.source === 'audio' ? ' · 🎙 recording' : ''} · {m.actionItems.length} action items</p></button>
+              <button onClick={() => setDetail(m.id)} className="min-w-0 flex-1 text-left"><p className="truncate text-sm font-medium text-slate-800">{m.title}</p><p className="flex items-center gap-1 text-xs text-slate-400">{timeAgo(m.createdAt)}{m.source === 'audio' && <><span>·</span><Mic className="h-3 w-3" /><span>recording</span></>} · {m.actionItems.length} action items</p></button>
               <Badge tone={m.status === 'READY' ? 'green' : m.status === 'FAILED' ? 'red' : 'amber'}>{m.status === 'TRANSCRIBING' ? 'Transcribing…' : m.status === 'PROCESSING' ? 'Processing…' : m.status === 'READY' ? 'Ready' : 'Failed'}</Badge>
-              <Button size="sm" variant="ghost" aria-label={`Delete ${m.title}`} onClick={() => confirm('Delete this meeting?') && remove.mutate(m.id)}>🗑</Button>
+              <Button size="sm" variant="ghost" aria-label={`Delete ${m.title}`} onClick={() => confirm('Delete this meeting?') && remove.mutate(m.id)}><Trash2 className="h-4 w-4" /></Button>
             </div>
           ))}
         </Card>

@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { FileText, Trash2 } from 'lucide-react';
 import { api, del, download, get, post } from '../services/api';
 import { useWsKey } from '../hooks/useData';
 import { useRoleAtLeast } from '../store/auth';
@@ -17,7 +18,7 @@ export function SourceList({ sources }: { sources: Source[] }) {
       <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Sources</p>
       {sources.map((s, i) => (
         <div key={i} className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs">
-          <p className="font-medium text-slate-700">📄 {s.name} <span className="text-slate-400">· page {s.pageNumber}</span></p>
+          <p className="flex items-center gap-1.5 font-medium text-slate-700"><FileText className="h-3.5 w-3.5 shrink-0 text-slate-400" />{s.name} <span className="text-slate-400">· page {s.pageNumber}</span></p>
           <p className="mt-0.5 line-clamp-2 text-slate-500">“{s.snippet}”</p>
         </div>
       ))}
@@ -91,12 +92,12 @@ export default function DocumentsPanel({ projectId }: { projectId?: string }) {
       </Card>
 
       {docs.isLoading ? <Loading /> : !docs.data?.length ? (
-        <Empty title="No documents yet" icon="📄" hint="Upload requirements, specs or notes and ask the AI questions about them." />
+        <Empty title="No documents yet" icon={FileText} hint="Upload requirements, specs or notes and ask the AI questions about them." />
       ) : (
         <Card className="divide-y divide-slate-100">
           {docs.data.map((d) => (
             <div key={d.id} className="flex flex-wrap items-center gap-3 px-4 py-3">
-              <span className="text-xl">📄</span>
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500"><FileText className="h-4 w-4" /></div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium text-slate-800">{d.name}</p>
                 <p className="text-xs text-slate-400">{fmtBytes(d.size)} · {d.status === 'READY' ? `${d.pageCount} page${d.pageCount === 1 ? '' : 's'}, ${d.chunkCount} chunks · ` : ''}{typeof d.uploadedBy === 'object' ? d.uploadedBy?.name : ''} · {timeAgo(d.createdAt)}</p>
@@ -104,7 +105,7 @@ export default function DocumentsPanel({ projectId }: { projectId?: string }) {
               </div>
               <Badge tone={TONE[d.status]}>{d.status === 'PROCESSING' || d.status === 'PENDING' ? 'Processing…' : d.status === 'READY' ? 'Ready' : 'Failed'}</Badge>
               <Button size="sm" variant="secondary" onClick={() => download(`/documents/${d.id}/download`, d.name).catch(toast.error)}>Download</Button>
-              {canDelete && <Button size="sm" variant="ghost" onClick={() => confirm(`Delete "${d.name}"?`) && remove.mutate(d.id)} aria-label={`Delete ${d.name}`}>🗑</Button>}
+              {canDelete && <Button size="sm" variant="ghost" onClick={() => confirm(`Delete "${d.name}"?`) && remove.mutate(d.id)} aria-label={`Delete ${d.name}`}><Trash2 className="h-4 w-4" /></Button>}
             </div>
           ))}
         </Card>

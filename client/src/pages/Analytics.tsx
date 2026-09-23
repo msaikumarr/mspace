@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { BarChart3, Lock } from 'lucide-react';
 import { get } from '../services/api';
 import { useProjects, useWsKey } from '../hooks/useData';
 import { Button, Card, Empty, Loading, PageHeader, Progress, Select, StatCard } from '../components/ui';
@@ -25,7 +26,7 @@ export default function Analytics() {
       <PageHeader title="Analytics" subtitle="Decision-support on work items — not a measure of anyone's worth." actions={
         <Select className="w-52" value={projectId} onChange={(e) => setProjectId(e.target.value)} aria-label="Project"><option value="">All projects</option>{projects.data?.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</Select>
       } />
-      {q.isLoading || !d ? <Loading /> : d.totals.total === 0 ? <Empty icon="📊" title="No data yet" hint="Create some tasks and the charts will appear here." /> : (
+      {q.isLoading || !d ? <Loading /> : d.totals.total === 0 ? <Empty icon={BarChart3} title="No data yet" hint="Create some tasks and the charts will appear here." /> : (
         <div className="space-y-5">
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
             <StatCard label="Total tasks" value={d.totals.total} />
@@ -47,7 +48,7 @@ export default function Analytics() {
 
           {d.locked ? (
             <Card className="border-brand-200 bg-brand-50/60 p-6 text-center">
-              <p className="text-2xl">🔒</p>
+              <Lock className="mx-auto h-6 w-6 text-brand-500" strokeWidth={1.75} />
               <p className="mt-1 font-semibold text-slate-800">Advanced analytics is a Pro feature</p>
               <p className="mx-auto mt-1 max-w-md text-sm text-slate-500">Weekly throughput, member workload, team activity and per-project progress.</p>
               <a href="/app/billing"><Button className="mt-4">Upgrade</Button></a>
