@@ -27,6 +27,9 @@ export function createApp() {
     next();
   });
   app.use('/api', apiLimiter, routes);
+  // The API has no page of its own - send anyone opening the backend's bare URL to the app.
+  // 302, not 301: browsers cache 301s forever, and CLIENT_URL can change.
+  app.get('/', (_req, res) => res.redirect(302, env.CLIENT_URL.split(',')[0].trim().replace(/\/$/, '')));
   app.use(notFoundHandler);
   app.use(errorHandler);
   return app;

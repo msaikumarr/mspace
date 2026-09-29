@@ -82,4 +82,10 @@ describe('auth', () => {
     expect(bad.status).toBe(400);
     expect(bad.body.error.code).toBe('BAD_JSON');
   });
+
+  it('redirects the bare backend URL to the client app', async () => {
+    const r = await request(app).get('/');
+    expect(r.status).toBe(302);
+    expect(r.headers.location).toMatch(/^https?:\/\/[^,]+[^/,]$/);
+  });
 });
