@@ -4,6 +4,17 @@ server {
   index index.html;
   client_max_body_size 30m; # must stay above MAX_AUDIO_MB (recordings) and MAX_UPLOAD_MB
 
+  # proxy_pass with a literal hostname resolves it ONCE at startup and caches that IP
+  # forever. A public host like backend-xxxx.onrender.com sits behind a CDN whose IPs
+  # rotate, so after a few minutes the cached IP goes stale and every /api call fails
+  # until nginx restarts. Proxying through a variable plus a `resolver` makes nginx
+  # re-resolve the name (re-checked every 30s). NGINX_LOCAL_RESOLVERS is filled in
+  # from the container's /etc/resolv.conf by the official image's entrypoint (enabled
+  # via NGINX_ENTRYPOINT_LOCAL_RESOLVERS in the Dockerfile) - Docker's embedded DNS
+  # under docker-compose, the host's DNS on Render.
+  resolver ${NGINX_LOCAL_RESOLVERS} valid=30s ipv6=off;
+  set $backend ${BACKEND_URL};
+
   # Same-origin API and websocket proxy so the refresh-token cookie stays first-party.
   # BACKEND_URL is substituted at container start (nginx's official envsubst-on-templates
   # entrypoint). Default below (set in the Dockerfile) matches docker-compose's backend
@@ -17,14 +28,17 @@ server {
   # names the backend trips its edge's loop protection (508 Loop Detected). Leaving it
   # unset makes nginx default to $proxy_host - the backend's own host:port - instead.
   location /api/ {
-    proxy_pass ${BACKEND_URL};
+    proxy_pass $backend;
     proxy_ssl_server_name on;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
+    # Render's free tier sleeps an idle backend; the first request then waits for it to
+    # boot, which can exceed nginx's 60s default and show up as a 504.
+    proxy_read_timeout 120s;
   }
 
   location /socket.io/ {
-    proxy_pass ${BACKEND_URL};
+    proxy_pass $backend;
     proxy_ssl_server_name on;
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
